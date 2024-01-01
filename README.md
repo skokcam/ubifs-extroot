@@ -12,7 +12,7 @@ So here is my game plan:
 
 OpenWrt doesn't allow these steps to be completed as is but thankfully there is a way for mounting luks formatted partitions as extroot in documentation [1]: replace "block-mount" package's block utility with a script. A few (ok, dozens) tries later I had a working script.
 
-Notice this is not a catchall script like the original luks-mount script, this script expects ubi container at /dev/sda2 and new mtd partition as /dev/mtd7. Of course it is possible to write a cathcall script:
+Notice this is not a catchall script like the original luks-mount script, this script expects ubi container at /dev/sda2 and new mtd partition as /dev/mtd7. Of course it is possible to write a cathall script:
 
 TODO:
 - enumerate block partition (preferably parsing output of block) and find ubi containers
