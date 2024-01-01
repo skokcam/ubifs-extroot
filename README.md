@@ -13,7 +13,7 @@ So here is my game plan:
 - Format the new mtd partition (mtd7) as ubifs[[3](https://bootlin.com/blog/creating-flashing-ubi-ubifs-images/)]
 - Use new ubifs partition as extroot
 
-OpenWrt doesn't allow these steps to be completed as is, but thankfully there is a way for [mounting luks formatted partitions as extroot](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration#luks_encrypted_extroot) in documentation: rename then replace "[block-mount](https://openwrt.org/packages/pkgdata/block-mount)" package's block utility with a script. Armed with this information, a few (ok, dozens) tries later I had a working script.
+OpenWrt doesn't allow these steps to be completed as is, but thankfully there is a way for [mounting luks formatted partitions as extroot](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration#luks_encrypted_extroot) in documentation: rename then replace "[block-mount](https://openwrt.org/packages/pkgdata/block-mount)" package's block utility with a script. Armed with this information, a few (ok, dozens) tries later I had a [working script](block).
 
 Notice this is not a catchall script like the original luks-mount script, this script expects ubi container at */dev/sda2* and new mtd partition as */dev/mtd7*. Of course it is possible to write a cathall script:
 
