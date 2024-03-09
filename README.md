@@ -12,7 +12,7 @@ So here is my game plan:
   - no fdisk installed on OpenWrt yet, so do this step on another computer
 - SSH into OpenWrt (W9980) and install required packages (block-mount, block2mtd)
   - opkg update
-  - opkg install block-mount block2mtd
+  - opkg install block-mount block2mtd kmod-usb-storage
 - Rename /sbin/block to /sbin/block.bin then install this script at /sbin/block
   - mv /sbin/block /sbin/block.bin
   - wget https://raw.githubusercontent.com/skokcam/ubifs-extroot/main/block.sh -O /sbin/block
