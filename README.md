@@ -10,10 +10,11 @@ Too bad both jffs2 and ubifs partitions need to be on mtd to be mounted. The sol
 So here is my game plan:
 - Prepare a 512 MiB partition on usb flash disk
   - no fdisk installed on OpenWrt yet, so do this step on another computer
-- SSH into OpenWrt (W9980) and install required packages (block-mount, block2mtd)
+- Configure OpenWrt box to connect to internet (we need OpenWrt repos)
+- SSH into OpenWrt (W9980) and install required packages (block-mount, block2mtd, kmod-usb-storage)
   - opkg update
   - opkg install block-mount block2mtd kmod-usb-storage
-- Rename /sbin/block to /sbin/block.bin then install this script at /sbin/block
+- Rename /sbin/block to /sbin/block.bin then install [this](block.sh) script at /sbin/block
   - mv /sbin/block /sbin/block.bin
   - wget https://raw.githubusercontent.com/skokcam/ubifs-extroot/main/block.sh -O /sbin/block
 - Emulate prepared usb flash partition (/dev/sda2 in my case) as mtd [[2](https://wiki.emacinc.com/wiki/Mounting_JFFS2_Images_on_a_Linux_PC)]  
