@@ -8,12 +8,44 @@ I cant install ext4 (too big), reiserfs, jfs neither did fit. So I am left with 
 Too bad both jffs2 and ubifs partitions need to be on mtd to be mounted. The solution: dimunitive "[kmod-block2mtd](https://openwrt.org/packages/pkgdata/kmod-block2mtd)" package which allows disk partitions to be used as mtd partition by linux.
 
 So here is my game plan:
-- Prepare a 512 Mib partition on usb flash disk
-- Mount prepared partition as mtd [[2](https://wiki.emacinc.com/wiki/Mounting_JFFS2_Images_on_a_Linux_PC)]
-- Format the new mtd partition (mtd7) as ubifs[[3](https://bootlin.com/blog/creating-flashing-ubi-ubifs-images/)]
-- Use new ubifs partition as extroot
+- Prepare a 512 MiB partition on usb flash disk
+  - no fdisk installed on OpenWrt yet, so do this step on another computer
+- SSH into OpenWrt (W9980) and install required packages (block-mount, block2mtd)
+  - opkg update
+  - opkg install block-mount block2mtd
+- Rename /sbin/block to /sbin/block.bin then install this script at /sbin/block
+  - mv /sbin/block /sbin/block.bin
+  - wget https://raw.githubusercontent.com/skokcam/ubifs-extroot/main/block.sh -O /sbin/block
+- Emulate prepared usb flash partition (/dev/sda2 in my case) as mtd [[2](https://wiki.emacinc.com/wiki/Mounting_JFFS2_Images_on_a_Linux_PC)]  
+  - modprobe block2mtd
+  - echo "/dev/sda2,64KiB" > /sys/module/block2mtd/parameters/block2mtd
+- Format the new emulated mtd partition (mtd7 in my case) as ubifs and mount it at /mnt [[3](https://bootlin.com/blog/creating-flashing-ubi-ubifs-images/)]
+  - ubiformat /dev/mtd7
+  - ubiattach -p /dev/mtd7
+  - ubimkvol /dev/ubi0 -N my_extroot -s 510Mib
+  - mount -t ubifs ubi0_0 /mnt
+- Copy contents of overlay to the newly created ubifs volume mounted at /mnt
+  - cp -a /overlay /mnt
+- Set new ubifs partition (/dev/ubi0_0 in my case) as extroot [[1](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration)]
+  - eval $(block info /dev/ubi0_0 | grep -o -e 'UUID="\S*"')
+  - eval $(block info | grep -o -e 'MOUNT="\S*/overlay"')
+  - uci -q delete fstab.extroot
+  - uci set fstab.extroot="mount"
+  - uci set fstab.extroot.uuid="${UUID}"
+  - uci set fstab.extroot.target="${MOUNT}"
+  - uci commit fstab
+- Set original overlay device to be mounted at /rwm  [[1](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration)]
+  - DEVICE="$(block info | sed -n -e '/MOUNT="\S*\/overlay"/s/:\s.*$//p')"
+  - uci -q delete fstab.rwm
+  - uci set fstab.rwm="mount"
+  - uci set fstab.rwm.device="${DEVICE}"
+  - uci set fstab.rwm.target="/rwm"
+  - uci commit fstab
+- Rebooot the router and hopefully everything works after restart
+  - reboot
+ 
 
-OpenWrt doesn't allow these steps to be completed as is, but thankfully there is a way for [mounting luks formatted partitions as extroot](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration#luks_encrypted_extroot) in documentation: rename then replace "[block-mount](https://openwrt.org/packages/pkgdata/block-mount)" package's block utility with a script. Armed with this information, a few (ok, dozens) tries later I had a [working script](block).
+OpenWrt doesn't allow these steps to be completed as is, but thankfully there is a way for [mounting luks formatted partitions as extroot](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration#luks_encrypted_extroot) in documentation: rename then replace "[block-mount](https://openwrt.org/packages/pkgdata/block-mount)" package's block utility with a script. Armed with this information, a few (ok, dozens) tries later I had a [working script](block.sh).
 
 Notice this is not a catchall script like the original luks-mount script, this script expects ubi container at */dev/sda2* and new mtd partition as */dev/mtd7*. Of course it is possible to write a cathall script:
 
