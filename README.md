@@ -7,16 +7,17 @@ I cant install ext4 (too big), reiserfs, jfs neither did fit. So I am left with 
 
 Too bad both jffs2 and ubifs partitions need to be on mtd to be mounted. The solution: dimunitive "[kmod-block2mtd](https://openwrt.org/packages/pkgdata/kmod-block2mtd)" package which allows disk partitions to be used as mtd partition by linux.
 
-So here is my game plan:
-- Prepare a 512 MiB partition on usb flash disk
+How it works:
+- Prepare a 512 MiB partition on usb flash disk (I resized the first partition on a usb flash disk and created a 512MiB sized second partition -> sda2)
   - no fdisk installed on OpenWrt yet, so do this step on another computer
 - Configure OpenWrt box to connect to internet (we need OpenWrt repos)
 - SSH into OpenWrt (W9980) and install required packages (block-mount, block2mtd, kmod-usb-storage)
   - opkg update
   - opkg install block-mount block2mtd kmod-usb-storage
-- Rename /sbin/block to /sbin/block.bin then install [this](block.sh) script at /sbin/block
+- Rename /sbin/block to /sbin/block.bin then install [this](block.sh) script at /sbin/block, then make this script executable
   - mv /sbin/block /sbin/block.bin
   - wget https://raw.githubusercontent.com/skokcam/ubifs-extroot/main/block.sh -O /sbin/block
+  - chmod +x /sbin/block
 - Emulate prepared usb flash partition (/dev/sda2 in my case) as mtd [[2](https://wiki.emacinc.com/wiki/Mounting_JFFS2_Images_on_a_Linux_PC)]  
   - modprobe block2mtd
   - echo "/dev/sda2,64KiB" > /sys/module/block2mtd/parameters/block2mtd
