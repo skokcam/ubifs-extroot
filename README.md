@@ -35,7 +35,7 @@ How it works:
   - uci set fstab.extroot="mount"
   - uci set fstab.extroot.uuid="${UUID}"
   - uci set fstab.extroot.target="${MOUNT}"
-  - uci commit fstab'
+  - uci commit fstab
 - Set original overlay device to be mounted at /rwm  [[1](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration)]
   - DEVICE="$(block info | sed -n -e '/MOUNT="\S*\/overlay"/s/:\s.*$//p')"
   - uci -q delete fstab.rwm
