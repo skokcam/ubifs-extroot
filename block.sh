@@ -1,4 +1,4 @@
-!/bin/sh
+#!/bin/sh
 
 # Set to 1 to enable debug logs
 export DEBUG=
