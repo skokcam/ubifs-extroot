@@ -29,13 +29,13 @@ How it works:
 - Copy contents of overlay to the newly created ubifs volume mounted at /mnt
   - cp -a /overlay /mnt
 - Set new ubifs partition (/dev/ubi0_0 in my case) as extroot [[1](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration)]
-  - eval $(block info /dev/ubi0_0 | grep -o -e 'UUID="\S*"')
+  - eval $(block info | grep /dev/ubi0_0 | grep -o -e 'UUID="\S*"')
   - eval $(block info | grep -o -e 'MOUNT="\S*/overlay"')
   - uci -q delete fstab.extroot
   - uci set fstab.extroot="mount"
   - uci set fstab.extroot.uuid="${UUID}"
   - uci set fstab.extroot.target="${MOUNT}"
-  - uci commit fstab
+  - uci commit fstab'
 - Set original overlay device to be mounted at /rwm  [[1](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration)]
   - DEVICE="$(block info | sed -n -e '/MOUNT="\S*\/overlay"/s/:\s.*$//p')"
   - uci -q delete fstab.rwm
