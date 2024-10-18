@@ -24,7 +24,7 @@ How it works:
 - Format the new emulated mtd partition (mtd7 in my case) as ubifs and mount it at /mnt [[3](https://bootlin.com/blog/creating-flashing-ubi-ubifs-images/)]
   - ubiformat /dev/mtd7
   - ubiattach -p /dev/mtd7
-  - ubimkvol /dev/ubi0 -N my_extroot -s 510MiB
+  - ubimkvol /dev/ubi0 -m -N my_extroot
   - mount -t ubifs ubi0_0 /mnt
 - Copy contents of overlay to the newly created ubifs volume mounted at /mnt
   - cp -a /overlay /mnt
